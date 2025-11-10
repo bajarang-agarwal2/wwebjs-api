@@ -14,7 +14,7 @@ const triggerWebhook = (webhookURL, sessionId, dataType, data) => {
   }else{
       const { handleWhatsappWebhook } = require('./controllers/whatsappController');
       const result =  handleWhatsappWebhook({ dataType, data }).then(result => {
-          console.log(result);
+
       });
   }
 }
