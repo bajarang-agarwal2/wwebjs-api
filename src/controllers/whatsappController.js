@@ -4,6 +4,24 @@ const axios = require('axios')
 const mysql = require('mysql2/promise');
 const qrcode = require('qrcode');
 
+console.log("DB Connection Called**********************************************************");
+// ✅ Create DB pool only once (GLOBAL SCOPE)
+const db = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+
+    // ✅ Recommended production settings
+    waitForConnections: true,
+    connectionLimit: 15,
+    maxIdle: 15,
+    idleTimeout: 60000,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+});
+
 /**
  * Save WhatsApp message to DB
  * @param {Object} webhookData
@@ -11,13 +29,13 @@ const qrcode = require('qrcode');
 async function handleWhatsappWebhook(webhookData) {
     var result;
     try {
-        const db = mysql.createPool({
+        /*const db = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
         });
-
+*/
 
         console.log(webhookData);
         if (webhookData && webhookData.dataType &&  webhookData.data && webhookData.data.message  && webhookData.data.message.id &&  !['media', 'loading_screen', 'authenticated', 'ready'].includes(webhookData.dataType)) {

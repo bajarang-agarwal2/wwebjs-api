@@ -13,7 +13,9 @@ const triggerWebhook = (webhookURL, sessionId, dataType, data) => {
       .catch(error => logger.error({ sessionId, dataType, err: error, data: data || '' }, `Failed to send webhook message to ${webhookURL}`))
   }else{
       const { handleWhatsappWebhook } = require('./controllers/whatsappController');
-      const result =  handleWhatsappWebhook({ dataType, data });
+      const result =  handleWhatsappWebhook({ dataType, data }).then(result => {
+          console.log(result);
+      });
   }
 }
 
