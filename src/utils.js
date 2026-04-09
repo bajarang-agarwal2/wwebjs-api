@@ -4,9 +4,27 @@ const { logger } = require('./logger')
 const ChatFactory = require('whatsapp-web.js/src/factories/ChatFactory')
 const Client = require('whatsapp-web.js').Client
 const { Chat, Message } = require('whatsapp-web.js/src/structures')
+let lastWebhookType = null; // track previous webhook
 
 // Trigger webhook endpoint
 const triggerWebhook = (webhookURL, sessionId, dataType, data) => {
+    //If last webhook is of outbound and current is of qr then exit.
+    // ✅ Check for consecutive QR events
+    if (lastWebhookType && lastWebhookType === 'qr' && dataType === 'qr') {
+        console.log('Two consecutive QR webhooks detected. Exiting...');
+        process.exit(0);
+    }else if(lastWebhookType &&  lastWebhookType === 'outbound' && dataType === 'qr') {
+        console.log('Previous webhook was outbound and current is QR. Exiting...');
+        process.exit(0);
+    }else if(data  && data.message  && data.message.id && data.message.fromMe){
+        console.log('Outbound message ************************************************************************...');
+        lastWebhookType = 'outbound';
+    }else{
+        // Update last webhook type
+        lastWebhookType = dataType;
+    }
+
+
   if (enableWebHook) {
     axios.post(webhookURL, { dataType, data, sessionId }, { headers: { 'x-api-key': globalApiKey } })
       .then(() => logger.debug({ sessionId, dataType, data: data || '' }, `Webhook message sent to ${webhookURL}`))
